@@ -1,24 +1,36 @@
 package com.blog.blogapi.controller;
 
 import com.blog.blogapi.model.BlogPost;
+import com.blog.blogapi.model.BlogPostDTO;
+import com.blog.blogapi.service.BlogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @RestController
-@RequestMapping("api/posts")
+@RequestMapping("/api/posts")
 public class BlogController {
-    private List<BlogPost> posts = new ArrayList<>();
+    private final BlogService blogService;
 
-    // Dummy data for testing
-    public BlogController(){
-        posts.add(new BlogPost(1, "First Post", "Hello World",
-                LocalDate.now(), "Admin", Arrays.asList("General")));
+    @Autowired
+    public BlogController(BlogService blogService){
+        this.blogService = blogService;
     }
 
     @GetMapping
     public List<BlogPost> getAllPosts(){
-        return posts;
+        return blogService.getAllPosts();
+    }
+
+    @PostMapping
+    public void addPost(@RequestBody BlogPost post){
+        blogService.addPost(post);
+    }
+
+    @GetMapping("/summary")
+    public List<BlogPostDTO> getAllPostSummaries(){
+        return blogService.getAllPostsDTO();
     }
 }
+
