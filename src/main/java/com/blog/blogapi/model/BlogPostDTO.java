@@ -5,15 +5,15 @@ import java.util.List;
 
 public class BlogPostDTO {
     private String title;
-    private String author;
+    private Author author;
     private LocalDate date;
-    private List<String> categories;
+    private List<Category> categories;
 
     public BlogPostDTO(){}
 
-    public BlogPostDTO(String title, String author, LocalDate date, List<String> categories){
+    public BlogPostDTO(String title, Author author, LocalDate date, List<Category> categories){
         this.title = title;
-        this.author = title;
+        this.author = author;
         this.date = date;
         this.categories = categories;
     }
@@ -22,7 +22,7 @@ public class BlogPostDTO {
         return title;
     }
 
-    public String getAuthor(){
+    public Author getAuthor(){
         return author;
     }
 
@@ -30,7 +30,7 @@ public class BlogPostDTO {
         return date;
     }
 
-    public List<String> getCategories(){
+    public List<Category> getCategories(){
         return categories;
     }
 }

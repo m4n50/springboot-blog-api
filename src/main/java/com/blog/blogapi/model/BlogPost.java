@@ -1,5 +1,6 @@
 package com.blog.blogapi.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -10,15 +11,28 @@ public class BlogPost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String title;
     private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    @JsonManagedReference
+    private Author author;
+
     private LocalDate date;
-    private String author;
-    private List<String> categories;
+
+    @ManyToMany
+    @JoinTable(
+            name = "blogpost_category",
+            joinColumns = @JoinColumn(name = "blogpost_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private List<Category> categories;
 
     public BlogPost(){}
 
-    public BlogPost(int id, String title, String content, LocalDate date, String author, List<String> categories){
+    public BlogPost(int id, String title, String content, LocalDate date, Author author, List<Category> categories){
         this.id = id;
         this.title = title;
         this.content = content;
@@ -39,9 +53,9 @@ public class BlogPost {
     public LocalDate getDate(){ return date; }
     public void setDate(LocalDate date){ this.date = date; }
 
-    public String getAuthor(){ return author; }
-    public void setAuthor(String author){ this.author = author; }
+    public Author getAuthor(){ return author; }
+    public void setAuthor(Author author){ this.author = author; }
 
-    public List<String> getCategories(){ return categories; }
-    public void setCategories(List<String> categories){ this.categories = categories; }
+    public List<Category> getCategories(){ return categories; }
+    public void setCategories(List<Category> categories){ this.categories = categories; }
 }

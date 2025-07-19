@@ -39,6 +39,12 @@ public class BlogController {
         return blogService.getPostById(id);
     }
 
+
+    @PutMapping("/posts/{postId}/assignAuthor/{authorId}")
+    public BlogPost assignAuthorToPost(@PathVariable int postId, @PathVariable int authorId){
+        return blogService.assignAuthor(postId, authorId);
+    }
+
     @PutMapping("/posts/{id}")
     public BlogPost updatePost(@PathVariable int id, @RequestBody BlogPost updatedPost){
         BlogPost existingPost = blogService.getPostById(id);

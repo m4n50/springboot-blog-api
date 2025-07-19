@@ -1,6 +1,8 @@
 package com.blog.blogapi.service;
 
 import com.blog.blogapi.exception.PostNotFoundException;
+import com.blog.blogapi.exception.ResourceNotFoundException;
+import com.blog.blogapi.model.Author;
 import com.blog.blogapi.model.BlogPost;
 import com.blog.blogapi.model.BlogPostDTO;
 import com.blog.blogapi.repository.BlogPostRepository;
@@ -14,16 +16,19 @@ public class BlogService {
     private List<BlogPost> posts = new ArrayList<>();
 
     @Autowired
-    private BlogPostRepository repository;
+    private AuthorService authorService;
+
+    @Autowired
+    private BlogPostRepository blogPostRepository;
 
     public BlogService(){}
 
     public List<BlogPost> getAllPosts(){
-        return repository.findAll();
+        return blogPostRepository.findAll();
     }
 
     public void addPost(BlogPost post){
-        repository.save(post);
+        blogPostRepository.save(post);
     }
 
     public List<BlogPostDTO> getAllPostsDTO(){
@@ -40,21 +45,35 @@ public class BlogService {
     }
 
     public BlogPost getPostById(int id){
-        return repository.findById(id).orElse(null);
+        return blogPostRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Post not found with id " + id));
     }
 
     public BlogPost savePost(BlogPost post){
-        return repository.save(post);
+        return blogPostRepository.save(post);
     }
 
     public void deletePost(int id){
-        BlogPost existingPost = repository.findById(id).orElse(null);
+        BlogPost existingPost = blogPostRepository.findById(id).orElse(null);
         if(existingPost == null)
             throw new PostNotFoundException("Post not found with id " + id);
-        repository.delete(existingPost);
+        blogPostRepository.delete(existingPost);
     }
 
     public List<BlogPost> searchPostByTitle(String keyword){
-        return repository.findByTitleContainingIgnoreCase(keyword);
+        return blogPostRepository.findByTitleContainingIgnoreCase(keyword);
+    }
+
+    public BlogPost assignAuthor(int postId, int authorId){
+        BlogPost post = getPostById(postId);
+        Author author = authorService.getAuthorById(authorId);
+
+        if(post == null)
+            throw new ResourceNotFoundException("Post not found with id: " + postId);
+        if(author == null)
+            throw new ResourceNotFoundException("Author not found with id: " + authorId);
+
+        post.setAuthor(author);
+        return blogPostRepository.save(post);
     }
 }
