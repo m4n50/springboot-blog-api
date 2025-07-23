@@ -9,7 +9,7 @@ import java.util.Objects;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -23,7 +23,9 @@ public class Category {
         this.name = name;
     }
 
-    public int getId(){ return id; }
+    public Long getId(){ return id; }
+
+    public void setId(Long categoryId) { this.id = id; }
 
     public String getName(){ return name; }
 

@@ -8,7 +8,7 @@ import java.util.List;
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String name;
     private String email;
@@ -19,12 +19,15 @@ public class Author {
 
     public Author(){}
 
-    public Author(String name, String email){
+    public Author(String name, String email, Long id){
         this.name = name;
         this.email = email;
+        this.id = id;
     }
 
-    public int getId(){ return id; }
+    public Long getId(){ return id; }
+
+    public void setId(Long authorId){ this.id = id; }
 
     public String getName(){ return name; }
 
