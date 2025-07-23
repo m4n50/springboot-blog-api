@@ -5,15 +5,18 @@ import com.blog.blogapi.exception.ResourceNotFoundException;
 import com.blog.blogapi.model.Author;
 import com.blog.blogapi.model.BlogPost;
 import com.blog.blogapi.model.BlogPostDTO;
+import com.blog.blogapi.model.Category;
 import com.blog.blogapi.repository.BlogPostRepository;
+import com.blog.blogapi.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class BlogService {
-    private List<BlogPost> posts = new ArrayList<>();
 
     @Autowired
     private AuthorService authorService;
@@ -21,19 +24,20 @@ public class BlogService {
     @Autowired
     private BlogPostRepository blogPostRepository;
 
-    public BlogService(){}
+    @Autowired
+    private CategoryRepository categoryRepository;
 
-    public List<BlogPost> getAllPosts(){
+    public List<BlogPost> getAllPosts() {
         return blogPostRepository.findAll();
     }
 
-    public void addPost(BlogPost post){
+    public void addPost(BlogPost post) {
         blogPostRepository.save(post);
     }
 
-    public List<BlogPostDTO> getAllPostsDTO(){
+    public List<BlogPostDTO> getAllPostsDTO() {
         List<BlogPostDTO> dtos = new ArrayList<>();
-        for (BlogPost post : posts){
+        for (BlogPost post : blogPostRepository.findAll()) {
             dtos.add(new BlogPostDTO(
                     post.getTitle(),
                     post.getAuthor(),
@@ -44,36 +48,46 @@ public class BlogService {
         return dtos;
     }
 
-    public BlogPost getPostById(int id){
+    public BlogPost getPostById(Long id) {
         return blogPostRepository.findById(id)
-                .orElseThrow(()-> new ResourceNotFoundException("Post not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found with id " + id));
     }
 
-    public BlogPost savePost(BlogPost post){
+    public BlogPost savePost(BlogPost post) {
         return blogPostRepository.save(post);
     }
 
-    public void deletePost(int id){
-        BlogPost existingPost = blogPostRepository.findById(id).orElse(null);
-        if(existingPost == null)
-            throw new PostNotFoundException("Post not found with id " + id);
+    public void deletePost(Long id) {
+        BlogPost existingPost = blogPostRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException("Post not found with id " + id));
         blogPostRepository.delete(existingPost);
     }
 
-    public List<BlogPost> searchPostByTitle(String keyword){
+    public List<BlogPost> searchPostByTitle(String keyword) {
         return blogPostRepository.findByTitleContainingIgnoreCase(keyword);
     }
 
-    public BlogPost assignAuthor(int postId, int authorId){
+    public BlogPost assignAuthor(Long postId, Long authorId) {
         BlogPost post = getPostById(postId);
         Author author = authorService.getAuthorById(authorId);
 
-        if(post == null)
-            throw new ResourceNotFoundException("Post not found with id: " + postId);
-        if(author == null)
-            throw new ResourceNotFoundException("Author not found with id: " + authorId);
-
         post.setAuthor(author);
         return blogPostRepository.save(post);
+    }
+
+    public BlogPost assignCategoryToPost(Long postId, Long categoryId) {
+        BlogPost post = getPostById(postId);
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + categoryId));
+
+        if (!post.getCategories().contains(category)) {
+            post.getCategories().add(category);
+        }
+
+        return blogPostRepository.save(post);
+    }
+
+    public Page<BlogPost> getPaginatedPosts(Pageable pageable) {
+        return blogPostRepository.findAll(pageable);
     }
 }

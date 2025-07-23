@@ -10,7 +10,7 @@ import java.util.List;
 public class BlogPost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String title;
     private String content;
@@ -32,7 +32,7 @@ public class BlogPost {
 
     public BlogPost(){}
 
-    public BlogPost(int id, String title, String content, LocalDate date, Author author, List<Category> categories){
+    public BlogPost(Long id, String title, String content, LocalDate date, Author author, List<Category> categories){
         this.id = id;
         this.title = title;
         this.content = content;
@@ -41,8 +41,8 @@ public class BlogPost {
         this.categories = categories;
     }
 
-    public int getId(){ return id; }
-    public void setId(int id){ this.id = id; }
+    public Long getId(){ return id; }
+    public void setId(Long id){ this.id = id; }
 
     public String getTitle(){ return title; }
     public void setTitle(String title){ this.title = title; }

@@ -1,5 +1,6 @@
 package com.blog.blogapi.service;
 
+import com.blog.blogapi.exception.ResourceNotFoundException;
 import com.blog.blogapi.model.Author;
 import com.blog.blogapi.repository.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,8 @@ public class AuthorService {
         return authorRepository.save(author);
     }
 
-    public Author getAuthorById(int id){
-        return authorRepository.findById(id).orElse(null);
+    public Author getAuthorById(Long id){
+        return authorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Author not found with id " + id));
     }
 }
