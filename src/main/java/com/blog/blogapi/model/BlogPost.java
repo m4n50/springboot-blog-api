@@ -1,5 +1,7 @@
 package com.blog.blogapi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -28,6 +30,7 @@ public class BlogPost {
             joinColumns = @JoinColumn(name = "blogpost_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
+    @JsonIgnore
     private List<Category> categories;
 
     public BlogPost(){}

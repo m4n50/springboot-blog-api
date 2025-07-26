@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/posts")
 public class BlogController {
 
     private final BlogService blogService;
@@ -38,7 +38,7 @@ public class BlogController {
         return blogService.searchPostByTitle(keyword);
     }
 
-    @GetMapping("/posts")
+    @GetMapping
     public List<BlogPost> getAllPosts() {
         return blogService.getAllPosts();
     }
