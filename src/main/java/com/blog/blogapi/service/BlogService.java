@@ -4,7 +4,7 @@ import com.blog.blogapi.exception.PostNotFoundException;
 import com.blog.blogapi.exception.ResourceNotFoundException;
 import com.blog.blogapi.model.Author;
 import com.blog.blogapi.model.BlogPost;
-import com.blog.blogapi.model.BlogPostDTO;
+import com.blog.blogapi.DTO.BlogPostDTO;
 import com.blog.blogapi.model.Category;
 import com.blog.blogapi.repository.BlogPostRepository;
 import com.blog.blogapi.repository.CategoryRepository;
@@ -33,6 +33,15 @@ public class BlogService {
 
     public void addPost(BlogPost post) {
         blogPostRepository.save(post);
+    }
+
+    public BlogPost dtoToEntity(BlogPostDTO dto) {
+        BlogPost entity = new BlogPost();
+        entity.setTitle(dto.getTitle());
+        entity.setDate(dto.getDate());
+        entity.setAuthor(dto.getAuthor()); // assumes Author is already valid
+        entity.setCategories(dto.getCategories());
+        return entity;
     }
 
     public List<BlogPostDTO> getAllPostsDTO() {

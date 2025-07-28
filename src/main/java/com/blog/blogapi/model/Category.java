@@ -2,6 +2,8 @@ package com.blog.blogapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -12,6 +14,7 @@ public class Category {
     private Long id;
 
     @Column(nullable = false, unique = true)
+    @NotBlank(message = "Category name is required")
     private String name;
 
     private String description;

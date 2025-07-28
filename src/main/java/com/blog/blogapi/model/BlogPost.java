@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,16 +18,21 @@ public class BlogPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Title is required")
     private String title;
     private String content;
 
+    @Valid
     @ManyToOne
     @JoinColumn(name = "author_id")
+    @NotNull(message = "Author is required")
     @JsonManagedReference
     private Author author;
 
+    @NotNull(message = "Date is required")
     private LocalDate date;
 
+    @Valid
     @ManyToMany
     @JoinTable(
             name = "blogpost_category",
@@ -31,6 +40,7 @@ public class BlogPost {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     @JsonIgnore
+    @NotEmpty(message = "At least one category is required")
     private List<Category> categories;
 
     public BlogPost(){}

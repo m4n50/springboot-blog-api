@@ -2,6 +2,9 @@ package com.blog.blogapi.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.List;
 
 @Entity
@@ -10,7 +13,11 @@ public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Author name is required")
     private String name;
+
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is required")
     private String email;
 
     @OneToMany(mappedBy = "author")

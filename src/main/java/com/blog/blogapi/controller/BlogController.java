@@ -1,27 +1,33 @@
 package com.blog.blogapi.controller;
 
-import com.blog.blogapi.exception.ResourceNotFoundException;
+import com.blog.blogapi.mapper.BlogPostMapper;
 import com.blog.blogapi.model.BlogPost;
-import com.blog.blogapi.model.BlogPostDTO;
+import com.blog.blogapi.DTO.BlogPostDTO;
 import com.blog.blogapi.service.BlogService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping("/api")
+@Valid
 public class BlogController {
 
     private final BlogService blogService;
+    private final BlogPostMapper blogPostMapper;
 
     @Autowired
-    public BlogController(BlogService blogService) {
+    public BlogController(BlogService blogService, BlogPostMapper blogPostMapper) {
         this.blogService = blogService;
+        this.blogPostMapper = blogPostMapper;
     }
 
     @GetMapping("/posts/page")
@@ -44,8 +50,10 @@ public class BlogController {
     }
 
     @PostMapping("/posts")
-    public void addPost(@RequestBody BlogPost post) {
-        blogService.addPost(post);
+    public ResponseEntity<?> addPost(@Valid @RequestBody BlogPostDTO postDTO) {
+        BlogPost post = blogPostMapper.toEntity(postDTO);
+        blogService.savePost(post);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/posts/{id}")
