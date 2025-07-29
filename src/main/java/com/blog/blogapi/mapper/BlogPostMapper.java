@@ -1,6 +1,7 @@
 package com.blog.blogapi.mapper;
 
 import com.blog.blogapi.DTO.BlogPostDTO;
+import com.blog.blogapi.DTO.UpdateBlogPostDTO;
 import com.blog.blogapi.model.Author;
 import com.blog.blogapi.model.BlogPost;
 import com.blog.blogapi.model.Category;
@@ -43,5 +44,24 @@ public class BlogPostMapper {
         entity.setCategories(categoryEntities);
 
         return entity;
+    }
+
+    public void updateEntityFromDTO(UpdateBlogPostDTO dto, BlogPost post){
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+        post.setDate(dto.getDate());
+
+        authorRepository.findById(dto.getAuthorId())
+                .ifPresent(post::setAuthor);
+
+        if(dto.getCategoryIds() != null && !dto.getCategoryIds().isEmpty()){
+            List<Category> categories = dto.getCategoryIds().stream()
+                    .map(categoryRepository::findById)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+
+            post.setCategories(categories);
+        }
     }
 }

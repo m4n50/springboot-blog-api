@@ -1,5 +1,6 @@
 package com.blog.blogapi.controller;
 
+import com.blog.blogapi.DTO.UpdateBlogPostDTO;
 import com.blog.blogapi.mapper.BlogPostMapper;
 import com.blog.blogapi.model.BlogPost;
 import com.blog.blogapi.DTO.BlogPostDTO;
@@ -72,14 +73,19 @@ public class BlogController {
     }
 
     @PutMapping("/posts/{id}")
-    public BlogPost updatePost(@PathVariable Long id, @RequestBody BlogPost updatedPost) {
-        BlogPost existingPost = blogService.getPostById(id);
+    public ResponseEntity<?> updatePost(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateBlogPostDTO updateDTO) {
 
-        existingPost.setTitle(updatedPost.getTitle());
-        existingPost.setContent(updatedPost.getContent());
+        BlogPost existingPost = blogService.getPostById(id);
+        blogPostMapper.updateEntityFromDTO(updateDTO, existingPost);
+        blogService.savePost(existingPost);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Post updated successfully");
         // Add other fields like date, author, categories as needed
 
-        return blogService.savePost(existingPost);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/posts/{id}")
