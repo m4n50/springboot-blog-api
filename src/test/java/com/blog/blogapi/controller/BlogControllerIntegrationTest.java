@@ -50,27 +50,18 @@ public class BlogControllerIntegrationTest {
     @Test
     public void testCreateBlogPost(){
 
-        Author author = new Author();
-        author.setName("Jane Doe");
+        Author author = new Author("Jane Doe", "jane@example.com");
+        author = authorRepository.save(author);
 
-        Category category = new Category();
-        category.setName("Tech");
-        category.setDescription("Technology related");
+        Category category = new Category("Tech", "Technology related");
+        category = categoryRepository.save(category);
 
         String json = """
         {
-           "title": "RestAssured Post",
-           "date": "%s",
-           "author": {
-             "name": "Jane Doe",
-             "email": "jane@example.com"
-           },
-           "categories": [
-             {
-               "name": "Tech",
-               "description": "Technology related"
-             }
-           ]
+          "title": "RestAssured Post",
+          "date": "%s",
+          "authorId": %d,
+          "categoryIds": [%d]
         }
         """.formatted(LocalDate.now(), author.getId(), category.getId());
 
@@ -80,11 +71,46 @@ public class BlogControllerIntegrationTest {
         .when()
                 .post("api/posts")
         .then()
-                .statusCode(200);
+                .statusCode(201);
 
         List<BlogPost> posts = blogPostRepository.findAll();
-        assert(posts.size() == 1);
-        assert(posts.get(0).getTitle().equals("RestAssured Post"));
+        assertThat(posts).hasSize(1);
+        assertThat(posts.get(0).getTitle()).isEqualTo("RestAssured Post");
+    }
+
+    @Test
+    public void testCreateBlogPost_InvalidData_ShouldReturn400_AndValidationMessages() {
+        // Missing title and invalid categoryIds (empty list)
+        String invalidJson = """
+    {
+      "title": "",
+      "date": "%s",
+      "authorId": null,
+      "categoryIds": []
+    }
+    """.formatted(LocalDate.now());
+
+        var response = given()
+                .contentType("application/json")
+                .body(invalidJson)
+            .when()
+                .post("/api/posts")
+            .then()
+                .statusCode(400)
+                .contentType("application/json")
+                .extract()
+                .response();
+
+        System.out.println("Validation response:");
+        System.out.println(response.prettyPrint());
+
+        List<String> messages = response.jsonPath().getList("errors.message");
+
+        assertThat(messages).contains(
+                "Title is required",
+                "Author ID is required",
+                "At least one category ID must be provided"
+        );
     }
 
     @Test

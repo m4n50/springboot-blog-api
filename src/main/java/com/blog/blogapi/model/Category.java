@@ -31,6 +31,9 @@ public class Category {
         this.description = description;
     }
 
+    public Category(String tech, String technologyRelated) {
+    }
+
     public Long getId(){ return id; }
 
     public void setId(Long categoryId) { this.id = categoryId; }

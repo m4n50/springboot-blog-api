@@ -32,6 +32,9 @@ public class Author {
         this.id = id;
     }
 
+    public Author(String janeDoe, String mail) {
+    }
+
     public Long getId(){ return id; }
 
     public void setId(Long authorId){ this.id = id; }

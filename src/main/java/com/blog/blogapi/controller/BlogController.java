@@ -52,7 +52,7 @@ public class BlogController {
 
     @PostMapping("/posts")
     public ResponseEntity<?> addPost(@Valid @RequestBody BlogPostDTO postDTO) {
-        BlogPost post = blogPostMapper.toEntity(postDTO);
+        BlogPost post = blogService.dtoToEntity(postDTO);
         blogService.savePost(post);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

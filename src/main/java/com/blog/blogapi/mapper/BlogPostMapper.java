@@ -2,11 +2,13 @@ package com.blog.blogapi.mapper;
 
 import com.blog.blogapi.DTO.BlogPostDTO;
 import com.blog.blogapi.DTO.UpdateBlogPostDTO;
+import com.blog.blogapi.exception.ResourceNotFoundException;
 import com.blog.blogapi.model.Author;
 import com.blog.blogapi.model.BlogPost;
 import com.blog.blogapi.model.Category;
-import com.blog.blogapi.repository.AuthorRepository;
 import com.blog.blogapi.repository.CategoryRepository;
+import com.blog.blogapi.service.AuthorService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,32 +18,25 @@ import java.util.stream.Collectors;
 @Component
 public class BlogPostMapper {
 
-    private final AuthorRepository authorRepository;
-    private final CategoryRepository categoryRepository;
+    @Autowired
+    private AuthorService authorService;
 
-    public BlogPostMapper(AuthorRepository authorRepository, CategoryRepository categoryRepository) {
-        this.authorRepository = authorRepository;
-        this.categoryRepository = categoryRepository;
-    }
+    @Autowired
+    private CategoryRepository categoryRepository;
 
-    public BlogPost toEntity(BlogPostDTO dto) {
+    public BlogPost dtoToEntity(BlogPostDTO dto) {
         BlogPost entity = new BlogPost();
         entity.setTitle(dto.getTitle());
         entity.setDate(dto.getDate());
 
-        // Lookup Author by ID
-        Long authorId = dto.getAuthor().getId();
-        Optional<Author> authorOpt = authorRepository.findById(authorId);
-        authorOpt.ifPresent(entity::setAuthor);
+        Author author = authorService.getAuthorById(dto.getAuthorId());
+        entity.setAuthor(author);
 
-        // Lookup Categories by ID
-        List<Category> categoryEntities = dto.getCategories().stream()
-                .map(catDto -> categoryRepository.findById(catDto.getId()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-
-        entity.setCategories(categoryEntities);
+        List<Category> categories = dto.getCategoryIds().stream()
+                .map(id -> categoryRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + id)))
+                        .collect(Collectors.toList());
+        entity.setCategories(categories);
 
         return entity;
     }
@@ -51,16 +46,14 @@ public class BlogPostMapper {
         post.setContent(dto.getContent());
         post.setDate(dto.getDate());
 
-        authorRepository.findById(dto.getAuthorId())
-                .ifPresent(post::setAuthor);
+        Author author = authorService.getAuthorById(dto.getAuthorId());
+        post.setAuthor(author);
 
         if(dto.getCategoryIds() != null && !dto.getCategoryIds().isEmpty()){
             List<Category> categories = dto.getCategoryIds().stream()
-                    .map(categoryRepository::findById)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
-
+                .map(id -> categoryRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + id)))
+                .collect(Collectors.toList());
             post.setCategories(categories);
         }
     }

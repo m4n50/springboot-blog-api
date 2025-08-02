@@ -37,21 +37,38 @@ public class BlogService {
 
     public BlogPost dtoToEntity(BlogPostDTO dto) {
         BlogPost entity = new BlogPost();
+
         entity.setTitle(dto.getTitle());
         entity.setDate(dto.getDate());
-        entity.setAuthor(dto.getAuthor()); // assumes Author is already valid
-        entity.setCategories(dto.getCategories());
+
+        Author author = authorService.getAuthorById(dto.getAuthorId());
+        entity.setAuthor(author);
+
+        List<Category> categories = new ArrayList<>();
+        for (Long categoryId : dto.getCategoryIds()){
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + categoryId));
+
+            categories.add(category);
+        }
+
+        entity.setCategories(categories);
+
         return entity;
     }
 
     public List<BlogPostDTO> getAllPostsDTO() {
         List<BlogPostDTO> dtos = new ArrayList<>();
         for (BlogPost post : blogPostRepository.findAll()) {
+            List<Long> categoryIds = post.getCategories().stream()
+                    .map(Category::getId)
+                    .toList();
+
             dtos.add(new BlogPostDTO(
                     post.getTitle(),
-                    post.getAuthor(),
                     post.getDate(),
-                    post.getCategories()
+                    post.getAuthor().getId(),
+                    categoryIds
             ));
         }
         return dtos;
