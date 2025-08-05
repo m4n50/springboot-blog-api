@@ -31,15 +31,19 @@ public class BlogService {
         return blogPostRepository.findAll();
     }
 
-    public void addPost(BlogPost post) {
-        blogPostRepository.save(post);
+    public BlogPost addPost(BlogPostDTO dto) {
+        BlogPost post = dtoToEntity(dto);
+        return blogPostRepository.save(post);
+    }
+
+    public BlogPost savePost(BlogPost post) {
+        return blogPostRepository.save(post);
     }
 
     public BlogPost dtoToEntity(BlogPostDTO dto) {
         BlogPost entity = new BlogPost();
 
         entity.setTitle(dto.getTitle());
-        entity.setDate(dto.getDate());
 
         Author author = authorService.getAuthorById(dto.getAuthorId());
         entity.setAuthor(author);
@@ -66,7 +70,6 @@ public class BlogService {
 
             dtos.add(new BlogPostDTO(
                     post.getTitle(),
-                    post.getDate(),
                     post.getAuthor().getId(),
                     categoryIds
             ));
@@ -79,8 +82,15 @@ public class BlogService {
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id " + id));
     }
 
-    public BlogPost savePost(BlogPost post) {
-        return blogPostRepository.save(post);
+    public List<BlogPost> getPostsByCategory(Long categoryId){
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + categoryId));
+
+        return blogPostRepository.findByCategoriesContaining(category);
+    }
+
+    public List<BlogPost> getPostsByAuthor(Long authorId){
+        return blogPostRepository.findByAuthorId(authorId);
     }
 
     public void deletePost(Long id) {

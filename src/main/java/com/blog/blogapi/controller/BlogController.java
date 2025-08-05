@@ -52,14 +52,28 @@ public class BlogController {
 
     @PostMapping("/posts")
     public ResponseEntity<?> addPost(@Valid @RequestBody BlogPostDTO postDTO) {
-        BlogPost post = blogService.dtoToEntity(postDTO);
-        blogService.savePost(post);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        BlogPost savedPost = blogService.dtoToEntity(postDTO);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Post created successfully");
+        response.put("postId",savedPost.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/posts/{id}")
     public BlogPost getPostById(@PathVariable Long id) {
         return blogService.getPostById(id);
+    }
+
+    @GetMapping("/posts/byCategory/{categoryId}")
+    public List<BlogPost> getPostsByCategory(@PathVariable Long categoryId){
+        return blogService.getPostsByCategory(categoryId);
+    }
+
+    @GetMapping("/posts/byAuthor/{authorId}")
+    public List<BlogPost> getPostsByAuthor(@PathVariable Long authorId){
+        return blogService.getPostsByAuthor(authorId);
     }
 
     @PutMapping("/posts/{postId}/assignAuthor/{authorId}")
@@ -78,12 +92,15 @@ public class BlogController {
             @Valid @RequestBody UpdateBlogPostDTO updateDTO) {
 
         BlogPost existingPost = blogService.getPostById(id);
-        blogPostMapper.updateEntityFromDTO(updateDTO, existingPost);
-        blogService.savePost(existingPost);
 
-        Map<String, String> response = new HashMap<>();
+        blogPostMapper.updateEntityFromDTO(updateDTO, existingPost);
+
+        BlogPost updatedPost = blogService.savePost(existingPost);
+
+        Map<String, Object> response = new HashMap<>();
         response.put("message", "Post updated successfully");
-        // Add other fields like date, author, categories as needed
+        response.put("postId", updatedPost.getId());
+        response.put("title", updatedPost.getTitle());
 
         return ResponseEntity.ok(response);
     }

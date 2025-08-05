@@ -16,18 +16,21 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<CustomErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex,
-                                                                      HttpServletRequest request) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<CustomErrorResponse> handleValidationErrors(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request) {
+
+        Map<String, String> fieldErrors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
+                fieldErrors.put(error.getField(), error.getDefaultMessage())
         );
 
         CustomErrorResponse response = new CustomErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Validation error",
-                errors,
+                "Validation Failed",
+                "Some fields are invalid. Check 'errors' for details.",
+                fieldErrors,
                 request.getRequestURI()
         );
 
@@ -35,20 +38,23 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<CustomErrorResponse> handleConstraintViolation(ConstraintViolationException ex,
-                                                                         HttpServletRequest request) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<CustomErrorResponse> handleConstraintViolation(
+            ConstraintViolationException ex,
+            HttpServletRequest request) {
+
+        Map<String, String> violations = new HashMap<>();
         ex.getConstraintViolations().forEach(violation -> {
             String field = violation.getPropertyPath().toString();
             String message = violation.getMessage();
-            errors.put(field, message);
+            violations.put(field, message);
         });
 
         CustomErrorResponse response = new CustomErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 "Constraint Violation",
-                errors,
+                "Invalid values provided.",
+                violations,
                 request.getRequestURI()
         );
 
@@ -56,27 +62,33 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<CustomErrorResponse> handlePostNotFound(PostNotFoundException ex,
-                                                                  HttpServletRequest request){
+    public ResponseEntity<CustomErrorResponse> handlePostNotFound(
+            PostNotFoundException ex,
+            HttpServletRequest request) {
+
         CustomErrorResponse response = new CustomErrorResponse(
-             LocalDateTime.now(),
-             HttpStatus.NOT_FOUND.value(),
-            "Post not found",
-            ex.getMessage(),
-            request.getRequestURI()
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Resource Not Found",
+                ex.getMessage(),
+                null, // No field-specific errors
+                request.getRequestURI()
         );
 
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CustomErrorResponse> handleOtherErrors(Exception ex,
-                                                                 HttpServletRequest request) {
+    public ResponseEntity<CustomErrorResponse> handleGenericException(
+            Exception ex,
+            HttpServletRequest request) {
+
         CustomErrorResponse response = new CustomErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
                 ex.getMessage(),
+                null,
                 request.getRequestURI()
         );
 

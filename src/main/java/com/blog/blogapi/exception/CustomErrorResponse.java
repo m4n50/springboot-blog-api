@@ -6,10 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class CustomErrorResponse {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -17,18 +18,17 @@ public class CustomErrorResponse {
 
     private int status;
     private String error;
-    private Object message;
+    private String message;
+    private Map<String, String> errors;
     private String path;
 
-    public LocalDateTime getTimestamp(){ return timestamp; }
-    public int getStatus(){ return status; }
-    public String getError(){ return error; }
-    public Object getMessage(){ return message; }
-    public String getPath(){ return  path; }
-
-    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-    public void setStatus(int status) { this.status = status; }
-    public void setError(String error) { this.error = error; }
-    public void setMessage(Object message) { this.message = message; }
-    public void setPath(String path) { this.path = path; }
+    public CustomErrorResponse(LocalDateTime timestamp, int status, String error,
+                               String message, Map<String, String> errors, String path) {
+        this.timestamp = timestamp;
+        this.status = status;
+        this.error = error;
+        this.message = message;
+        this.errors = errors;
+        this.path = path;
+    }
 }
