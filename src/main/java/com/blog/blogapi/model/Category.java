@@ -3,6 +3,7 @@ package com.blog.blogapi.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 import java.util.Objects;
@@ -17,6 +18,7 @@ public class Category {
     @NotBlank(message = "Category name is required")
     private String name;
 
+    @Size(max = 255, message = "Description must be under 255 characters")
     private String description;
 
     @ManyToMany(mappedBy = "categories")
@@ -29,9 +31,6 @@ public class Category {
         this.id = id;
         this.name = name;
         this.description = description;
-    }
-
-    public Category(String tech, String technologyRelated) {
     }
 
     public Long getId(){ return id; }

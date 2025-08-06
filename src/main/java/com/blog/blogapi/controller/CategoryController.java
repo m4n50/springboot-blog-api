@@ -1,13 +1,16 @@
 package com.blog.blogapi.controller;
 
-import com.blog.blogapi.model.Category;
-import com.blog.blogapi.repository.CategoryRepository;
+import com.blog.blogapi.DTO.CategoryDTO;
 import com.blog.blogapi.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/categories")
@@ -21,23 +24,29 @@ public class CategoryController {
     }
 
     @GetMapping
-    public List<Category> getAllCategories(){
+    public List<CategoryDTO> getAllCategories(){
         return categoryService.getAllCategories();
     }
 
     @PostMapping
-    public Category addCategory(@RequestBody Category category){
-        return categoryService.addCategory(category);
+    public ResponseEntity<?> addCategory(@Valid @RequestBody CategoryDTO categoryDTO){
+        CategoryDTO savedCategory = categoryService.addCategory(categoryDTO);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Category created successfully");
+        response.put("categoryId", savedCategory.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
-    public Category getCategoryById(@PathVariable Long id){
+    public CategoryDTO getCategoryById(@PathVariable Long id){
         return categoryService.getCategoryById(id);
     }
 
     @PutMapping("/{id}")
-    public Category updateCategory(@PathVariable Long id, @RequestBody Category category){
-        return categoryService.updateCategory(id, category);
+    public CategoryDTO updateCategory(@PathVariable Long id, @RequestBody CategoryDTO categoryDTO){
+        return categoryService.updateCategory(id, categoryDTO);
     }
 
     @DeleteMapping("/{id}")
