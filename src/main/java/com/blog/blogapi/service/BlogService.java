@@ -2,6 +2,7 @@ package com.blog.blogapi.service;
 
 import com.blog.blogapi.exception.PostNotFoundException;
 import com.blog.blogapi.exception.ResourceNotFoundException;
+import com.blog.blogapi.mapper.BlogPostMapper;
 import com.blog.blogapi.model.Author;
 import com.blog.blogapi.model.BlogPost;
 import com.blog.blogapi.DTO.BlogPostDTO;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BlogService {
@@ -27,54 +29,34 @@ public class BlogService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    private final BlogPostMapper blogPostMapper;
+
+    public BlogService(AuthorService authorService,
+                       BlogPostRepository blogPostRepository,
+                       CategoryRepository categoryRepository,
+                       BlogPostMapper blogPostMapper){
+        this.authorService = authorService;
+        this.blogPostRepository = blogPostRepository;
+        this.categoryRepository = categoryRepository;
+        this.blogPostMapper = blogPostMapper;
+    };
+
     public List<BlogPost> getAllPosts() {
         return blogPostRepository.findAll();
     }
 
-    public BlogPost addPost(BlogPostDTO dto) {
-        BlogPost post = dtoToEntity(dto);
-        return blogPostRepository.save(post);
+//    public BlogPostDTO addPost(BlogPostDTO dto) {
+//        BlogPost post = blogPostMapper.dtoToEntity(dto);
+//        BlogPost saved = blogPostRepository.save(post);
+//        return blogPostMapper.entityToDto(saved);
+//    }
+
+    public BlogPost addPost(BlogPost blogPost){
+        return blogPostRepository.save(blogPost);
     }
 
     public BlogPost savePost(BlogPost post) {
         return blogPostRepository.save(post);
-    }
-
-    public BlogPost dtoToEntity(BlogPostDTO dto) {
-        BlogPost entity = new BlogPost();
-
-        entity.setTitle(dto.getTitle());
-
-        Author author = authorService.getAuthorById(dto.getAuthorId());
-        entity.setAuthor(author);
-
-        List<Category> categories = new ArrayList<>();
-        for (Long categoryId : dto.getCategoryIds()){
-            Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + categoryId));
-
-            categories.add(category);
-        }
-
-        entity.setCategories(categories);
-
-        return entity;
-    }
-
-    public List<BlogPostDTO> getAllPostsDTO() {
-        List<BlogPostDTO> dtos = new ArrayList<>();
-        for (BlogPost post : blogPostRepository.findAll()) {
-            List<Long> categoryIds = post.getCategories().stream()
-                    .map(Category::getId)
-                    .toList();
-
-            dtos.add(new BlogPostDTO(
-                    post.getTitle(),
-                    post.getAuthor().getId(),
-                    categoryIds
-            ));
-        }
-        return dtos;
     }
 
     public BlogPost getPostById(Long id) {
@@ -91,6 +73,15 @@ public class BlogService {
 
     public List<BlogPost> getPostsByAuthor(Long authorId){
         return blogPostRepository.findByAuthorId(authorId);
+    }
+
+    public BlogPost updatePost(Long id, BlogPost updatedPost){
+        BlogPost existingPost = getPostById(id);
+        existingPost.setTitle(updatedPost.getTitle());
+        existingPost.setContent(updatedPost.getContent());
+        existingPost.setCategories(updatedPost.getCategories());
+        existingPost.setAuthor(updatedPost.getAuthor());
+        return blogPostRepository.save(existingPost);
     }
 
     public void deletePost(Long id) {
@@ -125,5 +116,11 @@ public class BlogService {
 
     public Page<BlogPost> getPaginatedPosts(Pageable pageable) {
         return blogPostRepository.findAll(pageable);
+    }
+
+    public List<BlogPostDTO> getAllPostsDTO(){
+        return blogPostRepository.findAll().stream()
+                .map(blogPostMapper::entityToDto)
+                .collect(Collectors.toList());
     }
 }

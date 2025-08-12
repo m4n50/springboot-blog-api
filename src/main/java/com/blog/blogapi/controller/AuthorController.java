@@ -1,7 +1,6 @@
 package com.blog.blogapi.controller;
 
 import com.blog.blogapi.model.Author;
-import com.blog.blogapi.model.BlogPost;
 import com.blog.blogapi.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/authors")
+@RequestMapping("/api/authors")
 public class AuthorController {
     private final AuthorService authorService;
 

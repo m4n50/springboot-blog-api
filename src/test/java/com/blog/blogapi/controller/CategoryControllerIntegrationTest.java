@@ -33,6 +33,8 @@ public class CategoryControllerIntegrationTest {
     @BeforeEach
     void setUp(){
         RestAssured.port = port;
+        blogPostRepository.deleteAll();
+        categoryRepository.deleteAll();
     }
 
     @Test
@@ -118,4 +120,26 @@ public class CategoryControllerIntegrationTest {
         boolean exists = categoryRepository.existsById(cat.getId());
         assertThat(exists).isFalse();
     }
+
+    @Test
+    public void testCreateCategory_InvalidData_ShouldReturn400() {
+        String invalidJson = """
+    {
+      "name": "",
+      "description": ""
+    }
+    """;
+
+        var response = RestAssured.given()
+                .contentType("application/json")
+                .body(invalidJson)
+                .post("/api/categories")
+                .then()
+                .statusCode(400)
+                .extract()
+                .response();
+
+        System.out.println(response.prettyPrint());
+    }
+
 }

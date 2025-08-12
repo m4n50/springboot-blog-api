@@ -51,8 +51,8 @@ public class BlogController {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<?> addPost(@Valid @RequestBody BlogPostDTO postDTO) {
-        BlogPost savedPost = blogService.dtoToEntity(postDTO);
+    public ResponseEntity<?> addPost(@Valid @RequestBody BlogPost post) {
+        BlogPost savedPost = blogService.addPost(post); //August 8th, 2025 -> changed from BlogPostDTO to BlogPost for tests
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Post created successfully");

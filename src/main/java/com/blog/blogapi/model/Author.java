@@ -1,6 +1,6 @@
 package com.blog.blogapi.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -21,23 +21,25 @@ public class Author {
     private String email;
 
     @OneToMany(mappedBy = "author")
-    @JsonBackReference
+    @JsonManagedReference
     private List<BlogPost> posts;
 
     public Author(){}
 
-    public Author(String name, String email, Long id){
+    public Author(String name, String email){
         this.name = name;
         this.email = email;
-        this.id = id;
     }
 
-    public Author(String janeDoe, String mail) {
+    public Author(Long id, String name, String email){
+        this.id = id;
+        this.name = name;
+        this.email = email;
     }
 
     public Long getId(){ return id; }
 
-    public void setId(Long authorId){ this.id = id; }
+    public void setId(Long id){ this.id = id; }
 
     public String getName(){ return name; }
 

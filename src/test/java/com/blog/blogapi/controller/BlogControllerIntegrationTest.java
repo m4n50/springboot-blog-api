@@ -24,7 +24,6 @@ import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestPropertySource(locations = "classpath:application-test.properties")
 @ActiveProfiles("test")
 public class BlogControllerIntegrationTest {
     @LocalServerPort
@@ -53,7 +52,7 @@ public class BlogControllerIntegrationTest {
         Author author = new Author("Jane Doe", "jane@example.com");
         author = authorRepository.save(author);
 
-        Category category = new Category("Tech", "Technology related");
+        Category category = new Category(1L, "Tech", "Technology related");
         category = categoryRepository.save(category);
 
         String json = """

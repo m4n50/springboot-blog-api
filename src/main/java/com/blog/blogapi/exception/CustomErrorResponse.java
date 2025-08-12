@@ -1,16 +1,10 @@
 package com.blog.blogapi.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class CustomErrorResponse {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -31,4 +25,29 @@ public class CustomErrorResponse {
         this.errors = errors;
         this.path = path;
     }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public Map<String, String> getErrors() {
+        return errors;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
 }

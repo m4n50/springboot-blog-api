@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -39,6 +38,31 @@ public class BlogPostMapper {
         entity.setCategories(categories);
 
         return entity;
+    }
+
+    public BlogPostDTO entityToDto(BlogPost post) {
+        BlogPostDTO dto = new BlogPostDTO();
+        dto.setId(post.getId());
+        dto.setTitle(post.getTitle());
+        dto.setContent(post.getContent());
+        dto.setDate(post.getDate());
+        dto.setAuthorId(post.getAuthor().getId());
+
+        List<Long> categoryIds = post.getCategories().stream()
+                .map(Category::getId)
+                .collect(Collectors.toList());
+        dto.setCategoryIds(categoryIds);
+
+        return dto;
+    }
+
+    public static BlogPostDTO toDTO(BlogPost post) {
+        BlogPostDTO dto = new BlogPostDTO();
+        dto.setId(post.getId());
+        dto.setTitle(post.getTitle());
+        dto.setDate(post.getDate());
+        // map other fields
+        return dto;
     }
 
     public void updateEntityFromDTO(UpdateBlogPostDTO dto, BlogPost post){

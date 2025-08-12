@@ -2,7 +2,6 @@ package com.blog.blogapi.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -26,7 +25,7 @@ public class BlogPost {
     @ManyToOne
     @JoinColumn(name = "author_id")
     @NotNull(message = "Author is required")
-    @JsonManagedReference
+    @JsonBackReference
     private Author author;
 
     @NotNull(message = "Date is required")
