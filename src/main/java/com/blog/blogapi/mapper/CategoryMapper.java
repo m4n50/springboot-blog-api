@@ -24,4 +24,22 @@ public class CategoryMapper {
                 category.getDescription()
         );
     }
+
+    public CategoryDTO toDTO(Category category) {  // Return CategoryDTO, not Object
+        if (category == null) {
+            return null; // Handle null input gracefully
+        }
+
+        CategoryDTO dto = new CategoryDTO();
+        dto.setId(category.getId());
+        dto.setName(category.getName());
+        dto.setDescription(category.getDescription());
+
+        // Note: We don't map the 'posts' field because:
+        // 1. It has @JsonIgnore annotation
+        // 2. DTOs should be lightweight for API responses
+        // 3. Avoid circular reference issues (BlogPost -> Category -> BlogPost...)
+
+        return dto;
+    }
 }

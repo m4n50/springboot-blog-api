@@ -56,7 +56,7 @@ public class BlogPostMapper {
         return dto;
     }
 
-    public static BlogPostDTO toDTO(BlogPost post) {
+    public BlogPostDTO toDTO(BlogPost post) {
         BlogPostDTO dto = new BlogPostDTO();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());

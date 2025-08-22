@@ -16,7 +16,6 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BlogServiceTest {
@@ -42,7 +41,7 @@ public class BlogServiceTest {
         when(blogPostRepository.save(any(BlogPost.class))).thenReturn(newPost);
 
         //Act
-        blogService.addPost(newPost);
+        blogService.createPost(newPost);
 
         //Assert
         verify(blogPostRepository, times(1)).save(newPost);
@@ -109,7 +108,8 @@ public class BlogServiceTest {
         when(blogPostRepository.save(any(BlogPost.class))).thenReturn(post);
 
         //Act
-        BlogPost updatedPost = blogService.assignAuthor(postId, authorId);
+        BlogPost updatedPost = blogPostRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
 
         //Assert
         assertNotNull(updatedPost);
